@@ -45,9 +45,7 @@ graph = {(12,12): [(11,10)],
          (8,7): [(10,8)]
 }
 
-With a graph, we can use a walking function to determine if there is a path from the 0/1 to 22/23 in the x or y directions by getting all the nodes that have a 0/1 x/y and 22/23 x/y, then do a nested loop walking all possible begin and end points. We discussed using the cast object here, but opted have the player maintain the graph as a separate li
-
-* as the all positions on the board start out as pegs, but they are in an empty group. When the player selects one, it gets moved from empty to 'red' or 'black' group, and the player adds it to it's graph with any links.
+With a graph, we can use a walking function to determine if there is a path from the 0/1 to 22/23 in the x or y directions by getting all the nodes that have a 0/1 x/y and 22/23 x/y, then do a nested loop walking all possible begin and end points. We discussed using the cast object here, but opted have the player maintain the graph as a separate list as the all positions on the board start out as pegs, but they are in an empty group. When the player selects one, it gets moved from empty to 'red' or 'black' group, and the player adds it to it's graph with any links.
 
 We created a UML diagram discussing the new classes we would need, and followed the scene manager model for breaking these tasks up.
 

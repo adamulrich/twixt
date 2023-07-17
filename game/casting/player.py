@@ -3,8 +3,11 @@ from game.casting.actor import Actor
 from game.casting.pieces import Pieces
 from game.casting.peg import Peg
 from game.casting.point import Point
+from game.services.network_service import NetworkService
 from typing import List
-
+import socket
+import threading
+from constants import *
 
 class Player(Actor):
     """The responsibility of Player is to keep track of all the pegs and bridges that the player has and to determine 
@@ -16,10 +19,17 @@ class Player(Actor):
         _direction: the player 1 or 2
     """
 
-    def __init__(self, color, direction):
+    PORT = 9999
+    IPADDRESS = "localhost"
+
+
+    def __init__(self, color, direction, current_turn):
         super().__init__(color=color, position=Point(0,0),text="")
         self._pieces = Pieces()
         self._direction = direction
+        self.client_server = NETWORK_NONE
+        self._network_service = NetworkService()
+        self.current_turn = current_turn
 
 
     def get_pegs(self):
@@ -140,3 +150,37 @@ class Player(Actor):
 
     def get_direction(self):
         return self._direction
+
+
+    # def create_server(self):
+    #     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #     server.bind((self.SERVER, self.PORT))
+    #     server.listen(1)
+
+    #     self.client, addr = server.accept()
+
+    #     threading.Thread(target=self.handle_connection, args=(self.client,)).start()
+    #     server.close()
+
+    #     self.client_server = NETWORK_SERVER
+
+    # def create_client(self):
+    #     self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #     self.client.connect((self.IPADDRESS, self.PORT))
+
+    #     threading.Thread(target=self.handle_connection, args=(client,)).start()
+
+    #     self.client_server = NETWORK_CLIENT
+
+    def set_network(self, network_status):
+        self._network_service = NetworkService("localhost", 9999, network_status)
+
+    def get_client_data(self, client):
+        data = client.recv(1024)
+        if not data:
+            client.close()
+        else:
+            #make move
+            return data.decode('utf-8')
+
+

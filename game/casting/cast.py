@@ -103,3 +103,4 @@ class Cast:
         for player in self.get_actors(constants.PLAYERS_GROUP):
             if player is not self.get_first_actor(constants.CURRENT_PLAYER_GROUP):
                 return player
+

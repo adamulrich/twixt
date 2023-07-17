@@ -6,7 +6,7 @@
     "configurations": [
 
         {
-            "name": "Python: detfault",
+            "name": "Python: default",
             "type": "python",
             "request": "launch",
             "program": "__main__.py",

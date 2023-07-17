@@ -40,7 +40,7 @@ class HandleMovePreviewAction(Action):
 
         #if it's not a network game
         player: Player = cast.get_first_actor(constants.CURRENT_PLAYER_GROUP)
-        if player._network_service == NETWORK_NONE:
+        if player.client_server == NETWORK_NONE:
         
 
             # get the empty holes

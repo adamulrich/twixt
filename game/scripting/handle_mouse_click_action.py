@@ -33,7 +33,7 @@ class HandleMouseClickAction(Action):
         player: Player = cast.get_first_actor(CURRENT_PLAYER_GROUP)
 
         # if it isn't a network game
-        if player._network_service == NETWORK_NONE:
+        if player.client_server == NETWORK_NONE:
 
             #if the mouse button is pressed
             if self._mouse_service.is_button_pressed('left'):

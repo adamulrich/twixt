@@ -23,14 +23,14 @@ class Player(Actor):
     IPADDRESS = "localhost"
 
 
-    def __init__(self, color, direction, current_turn):
+    def __init__(self, color, direction):
         super().__init__(color=color, position=Point(0,0),text="")
         self.me = False
         self._pieces = Pieces()
         self._direction = direction
         self.client_server = NETWORK_NONE
-        self._network_service = NetworkService()
-        self.current_turn = current_turn
+        self.network_service = None
+        self.current_turn = None
 
 
     def get_pegs(self):
@@ -174,7 +174,7 @@ class Player(Actor):
     #     self.client_server = NETWORK_CLIENT
 
     def set_network(self, network_status):
-        self._network_service = NetworkService("localhost", 9999, network_status)
+        self.network_service = NetworkService(self.IPADDRESS,self.PORT, network_status)
 
     def get_client_data(self, client):
         data = client.recv(1024)

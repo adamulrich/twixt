@@ -35,14 +35,41 @@ class HandleNetworkMouseClickAction(Action):
 
 
         # if it is our turn we get the data
-        if player.me:
-        
-            #if the mouse button is pressed
-            if self._mouse_service.is_button_pressed('left'):
+        if player.client_server != NETWORK_NONE:
+            if player.me:
+            
+                #if the mouse button is pressed
+                if self._mouse_service.is_button_pressed('left'):
 
-                #get position
-                position: Point = self._mouse_service.get_coordinates()
+                    #get position
+                    position: Point = self._mouse_service.get_coordinates()
 
+
+                    # get the empty holes
+                    holes: list[Actor] = cast.get_actors(HOLES_GROUP)
+
+                    #translate this to a location for a hole
+                    for hole in holes:
+                        if self._is_mouse_over(hole.get_screen_position(), position):
+
+                            #check for valid location for this player
+                            direction = player.get_direction()
+                            if  MIN_X[direction] <= hole.get_position().get_x() <= MAX_X[direction] \
+                                and MIN_Y[direction] <= hole.get_position().get_y() <= MAX_Y[direction]:
+
+                                #remove hole from hole list
+                                cast.remove_actor(HOLES_GROUP,hole)
+
+                                #create a new peg, add it to the new hole group
+                                peg = Peg(player.get_color(), player.get_direction(), hole.get_position())
+                                cast.add_actor(NEW_PEG_GROUP,peg)
+
+                                # send data to other player
+                                player._network_service.send_data(po)
+
+                                break
+            else:
+                position = player.network_service.get_data()
 
                 # get the empty holes
                 holes: list[Actor] = cast.get_actors(HOLES_GROUP)
@@ -63,33 +90,7 @@ class HandleNetworkMouseClickAction(Action):
                             peg = Peg(player.get_color(), player.get_direction(), hole.get_position())
                             cast.add_actor(NEW_PEG_GROUP,peg)
 
-                            # send data to other player
-                            player._network_service.send_data(po)
-
                             break
-        else:
-            position = player._network_service.get_data()
-
-            # get the empty holes
-            holes: list[Actor] = cast.get_actors(HOLES_GROUP)
-
-            #translate this to a location for a hole
-            for hole in holes:
-                if self._is_mouse_over(hole.get_screen_position(), position):
-
-                    #check for valid location for this player
-                    direction = player.get_direction()
-                    if  MIN_X[direction] <= hole.get_position().get_x() <= MAX_X[direction] \
-                        and MIN_Y[direction] <= hole.get_position().get_y() <= MAX_Y[direction]:
-
-                        #remove hole from hole list
-                        cast.remove_actor(HOLES_GROUP,hole)
-
-                        #create a new peg, add it to the new hole group
-                        peg = Peg(player.get_color(), player.get_direction(), hole.get_position())
-                        cast.add_actor(NEW_PEG_GROUP,peg)
-
-                        break
 
 
 

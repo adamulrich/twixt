@@ -8,13 +8,13 @@ def main():
 
     network_status = NETWORK_NONE
 
-    if sys.argv.count >1:
+    if len(sys.argv) > 1:
         arg = sys.argv[1].lower()
     
-        if arg == "server":
+        if arg == "--server":
             network_status == NETWORK_SERVER
 
-        elif arg == "client":
+        elif arg == "--client":
             network_status == NETWORK_CLIENT
 
 

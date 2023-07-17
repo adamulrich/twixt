@@ -40,7 +40,7 @@ class SceneManager:
     CHANGE_PLAYER_ACTION = ChangePlayerAction()
     HANDLE_WIN_ACTION = HandleWinAction()
     HANDLE_MOVE_PREVIEW_ACTION = HandleMovePreviewAction(VIDEO_SERVICE, MOUSE_SERVICE)
-    HANDLE_NETWORK_MOUSE_CLICK_ACTION = HandleNetworkMouseClickAction()
+    HANDLE_NETWORK_MOUSE_CLICK_ACTION = HandleNetworkMouseClickAction(MOUSE_SERVICE)
 
 
     START_DRAWING_ACTION = StartDrawingAction(VIDEO_SERVICE)
@@ -54,11 +54,11 @@ class SceneManager:
     RELEASE_DEVICES_ACTION = ReleaseDevicesAction( VIDEO_SERVICE)
     
 
-    def __init__(self):
+    def __init__(self, network_status):
         """ Initialization for a SceneManager"""
-        pass
+        self.network_status = network_status
 
-    def prepare_scene(self, scene, cast: Cast, script: Script, network_service: NetworkService):
+    def prepare_scene(self, scene, cast: Cast, script: Script):
         """Prepares the scene that corresponds to a number
 
     
@@ -77,13 +77,13 @@ class SceneManager:
             self._prepare_game_over(cast, script)
 
 
-        self.networking_service = network_service
+
 
     # ----------------------------------------------------------------------------------------------
     # scene methods
     # ----------------------------------------------------------------------------------------------
 
-    def _prepare_new_game(self, cast: Cast, script: Script, network_status):
+    def _prepare_new_game(self, cast: Cast, script: Script):
         """Prepares a new game
 
         Args:
@@ -92,7 +92,7 @@ class SceneManager:
         """
         self._add_board(cast)
         self._add_dialog(cast, ENTER_TO_START)
-        self._add_players(cast, network_status)
+        self._add_players(cast, self.network_status)
 
         self._add_initialize_script(script)
 
@@ -138,12 +138,14 @@ class SceneManager:
         if network_status == NETWORK_SERVER:
             player: Player = cast._current_player
             player.set_network(network_status)
-            player.current_turn = True
+            player.current_tu5rn = True
+            player.me = True
 
         if network_status == NETWORK_CLIENT:
             player: Player = cast.get_next_player()
             player.set_network(network_status)
             player.current_turn = False
+            player.me = True
             
 
     def _add_dialog(self, cast: Cast, message):

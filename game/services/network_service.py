@@ -17,7 +17,6 @@ class NetworkService:
         self.client = None
 
     
-    def host_game(self, host, port):
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.bind((host, port))
         server.listen(1)

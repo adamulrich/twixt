@@ -18,8 +18,8 @@ class DrawNetworkWaitingAction(Action):
 
         #if it is a network game, and we are waiting, then draw waiting message
 
-        current_player: Player = cast._current_player
-        if not current_player.current_turn:
+        current_player: Player = cast.get_first_actor(constants.CURRENT_PLAYER_GROUP)
+        if not current_player.current_turn and current_player.client_server != constants.NETWORK_NONE:
             status: Actor = cast.get_first_actor(constants.STATUS_GROUP)
             status.set_text("Waiting on other player")
             status.set_color(current_player.get_color())

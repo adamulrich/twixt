@@ -32,41 +32,39 @@ class HandleMouseClickAction(Action):
         """
         player: Player = cast.get_first_actor(CURRENT_PLAYER_GROUP)
 
-        #if the mouse button is pressed
-        if self._mouse_service.is_button_pressed('left'):
+        # if it isn't a network game
+        if player._network_service == NETWORK_NONE:
 
-            #get position
-            position: Point = self._mouse_service.get_coordinates()
+            #if the mouse button is pressed
+            if self._mouse_service.is_button_pressed('left'):
 
-            # get the empty holes
-            holes: list[Actor] = cast.get_actors(HOLES_GROUP)
+                #get position
+                position: Point = self._mouse_service.get_coordinates()
 
-            #translate this to a location for a hole
-            for hole in holes:
-                if self._is_mouse_over(hole.get_screen_position(), position):
+                # get the empty holes
+                holes: list[Actor] = cast.get_actors(HOLES_GROUP)
 
-                    #check for valid location for this player
-                    direction = player.get_direction()
-                    if  MIN_X[direction] <= hole.get_position().get_x() <= MAX_X[direction] \
-                        and MIN_Y[direction] <= hole.get_position().get_y() <= MAX_Y[direction]:
+                #translate this to a location for a hole
+                for hole in holes:
+                    if self._is_mouse_over(hole.get_screen_position(), position):
 
-                        #remove hole from hole list
-                        cast.remove_actor(HOLES_GROUP,hole)
+                        #check for valid location for this player
+                        direction = player.get_direction()
+                        if  MIN_X[direction] <= hole.get_position().get_x() <= MAX_X[direction] \
+                            and MIN_Y[direction] <= hole.get_position().get_y() <= MAX_Y[direction]:
 
-                        #create a new peg, add it to the new hole group
-                        peg = Peg(player.get_color(), player.get_direction(), hole.get_position())
-                        cast.add_actor(NEW_PEG_GROUP,peg)
+                            #remove hole from hole list
+                            cast.remove_actor(HOLES_GROUP,hole)
 
-                        #if we are the client, we need to send data to the server
-                        
-                
+                            #create a new peg, add it to the new hole group
+                            peg = Peg(player.get_color(), player.get_direction(), hole.get_position())
+                            cast.add_actor(NEW_PEG_GROUP,peg)
 
-                        break
-
+                            #if we are the client, we need to send data to the server
+                            
                     
-            
- 
-                       
+
+                            break
 
     def _is_mouse_over(self, hole: Actor, position: Point):
         """determines if the mouse is over a hole

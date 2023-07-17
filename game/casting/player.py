@@ -25,6 +25,7 @@ class Player(Actor):
 
     def __init__(self, color, direction, current_turn):
         super().__init__(color=color, position=Point(0,0),text="")
+        self.me = False
         self._pieces = Pieces()
         self._direction = direction
         self.client_server = NETWORK_NONE

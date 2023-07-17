@@ -1,4 +1,4 @@
-import constants
+from constants import *
 from game.casting.cast import Cast
 from game.casting.peg import Peg
 from game.casting.point import Point
@@ -31,36 +31,69 @@ class HandleNetworkMouseClickAction(Action):
             script: An instance of Script containing the actions in the game.
             callback: An instance of ActionCallback so we can change the scene.
         """
-        player: Player = cast.get_first_actor(constants.CURRENT_PLAYER_GROUP)
+        player: Player = cast.get_first_actor(CURRENT_PLAYER_GROUP)
 
-        # if it is our turn we process as normal.
-        
-        
 
-        #if the mouse button is pressed
-        if self._mouse_service.is_button_pressed('left'):
+        # if it is our turn we get the data
+        if player.me:
+        
+            #if the mouse button is pressed
+            if self._mouse_service.is_button_pressed('left'):
+
+                #get position
+                position: Point = self._mouse_service.get_coordinates()
+
+
+                # get the empty holes
+                holes: list[Actor] = cast.get_actors(HOLES_GROUP)
+
+                #translate this to a location for a hole
+                for hole in holes:
+                    if self._is_mouse_over(hole.get_screen_position(), position):
+
+                        #check for valid location for this player
+                        direction = player.get_direction()
+                        if  MIN_X[direction] <= hole.get_position().get_x() <= MAX_X[direction] \
+                            and MIN_Y[direction] <= hole.get_position().get_y() <= MAX_Y[direction]:
+
+                            #remove hole from hole list
+                            cast.remove_actor(HOLES_GROUP,hole)
+
+                            #create a new peg, add it to the new hole group
+                            peg = Peg(player.get_color(), player.get_direction(), hole.get_position())
+                            cast.add_actor(NEW_PEG_GROUP,peg)
+
+                            # send data to other player
+                            player._network_service.send_data(po)
+
+                            break
+        else:
+            position = player._network_service.get_data()
 
             # get the empty holes
-            holes: list[Actor] = cast.get_actors(constants.HOLES_GROUP)
+            holes: list[Actor] = cast.get_actors(HOLES_GROUP)
 
             #translate this to a location for a hole
             for hole in holes:
-                if self._is_mouse_over(hole.get_screen_position()):
+                if self._is_mouse_over(hole.get_screen_position(), position):
 
                     #check for valid location for this player
                     direction = player.get_direction()
-                    if  constants.MIN_X[direction] <= hole.get_position().get_x() <= constants.MAX_X[direction] \
-                        and constants.MIN_Y[direction] <= hole.get_position().get_y() <= constants.MAX_Y[direction]:
+                    if  MIN_X[direction] <= hole.get_position().get_x() <= MAX_X[direction] \
+                        and MIN_Y[direction] <= hole.get_position().get_y() <= MAX_Y[direction]:
 
                         #remove hole from hole list
-                        cast.remove_actor(constants.HOLES_GROUP,hole)
+                        cast.remove_actor(HOLES_GROUP,hole)
 
                         #create a new peg, add it to the new hole group
                         peg = Peg(player.get_color(), player.get_direction(), hole.get_position())
-                        cast.add_actor(constants.NEW_PEG_GROUP,peg)
+                        cast.add_actor(NEW_PEG_GROUP,peg)
+
                         break
 
-    def _is_mouse_over(self, hole: Actor):
+
+
+    def _is_mouse_over(self, hole: Actor, position: Point):
         """determines if the mouse is over a hole
 
         Args:
@@ -71,14 +104,13 @@ class HandleNetworkMouseClickAction(Action):
         """
 
         #get the min and max for the hole
-        min_x = hole.get_x() - int(constants.SCREEN_SCALE/2)
-        min_y = hole.get_y() - int(constants.SCREEN_SCALE/2)
+        min_x = hole.get_x() - int(SCREEN_SCALE/2)
+        min_y = hole.get_y() - int(SCREEN_SCALE/2)
         
-        max_x = min_x + constants.SCREEN_SCALE - 1
-        max_y = min_y + constants.SCREEN_SCALE - 1
+        max_x = min_x + SCREEN_SCALE - 1
+        max_y = min_y + SCREEN_SCALE - 1
 
         #get current mouse position
-        position: Point = self._mouse_service.get_coordinates()
 
         if (min_x <= position.get_x()  <= max_x) and (min_y <= position.get_y() <= max_y):
             return True

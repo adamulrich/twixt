@@ -1,6 +1,7 @@
 import socket
 import threading
 from constants import *
+from game.casting.point import Point
 
 class NetworkService:
 
@@ -13,6 +14,7 @@ class NetworkService:
         else:
             self.connect_to_game(host, port)
             
+        self.client = None
 
     
     def host_game(self, host, port):
@@ -20,25 +22,26 @@ class NetworkService:
         server.bind((host, port))
         server.listen(1)
 
-        client, addr = server.accept()
-
-        self.server = PLAYER_RED
-        self.client = PLAYER_BLACK
-        self.me = PLAYER_RED
-
-        threading.Thread(target=self.handle_connection, args=(client,)).start()
-        server.close()
+        self.client, self.addr = server.accept()
 
 
     def connect_to_game(self, host, port):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect((host, port))
 
-        self.server = PLAYER_BLACK
-        self.client = PLAYER_RED
-        self.me = PLAYER_BLACK
+        #threading.Thread(target=self.handle_connection, args=(client,)).start()
 
-        threading.Thread(target=self.handle_connection, args=(client,)).start()
+    def get_data(self): 
+        while True:
+            data = self.client.recv(1024)
+            position = data.decode('utf-8')
+            print(position)
+            return Point(position[0], position[1])
+
+
+    def send_data(self, position: Point):
+        self.client.send((position.get_x(), position.get_y()))
+
 
     def handle_connection(self, client):
         while not self.game_over:

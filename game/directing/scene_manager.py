@@ -1,4 +1,5 @@
 import csv
+import socket
 from constants import *
 from game.casting.label import Label
 from game.casting.point import Point
@@ -54,9 +55,10 @@ class SceneManager:
     RELEASE_DEVICES_ACTION = ReleaseDevicesAction( VIDEO_SERVICE)
     
 
-    def __init__(self, network_status):
+    def __init__(self, network_status, ip_address):
         """ Initialization for a SceneManager"""
         self.network_status = network_status
+        self.ip_address = ip_address
 
     def prepare_scene(self, scene, cast: Cast, script: Script):
         """Prepares the scene that corresponds to a number
@@ -90,8 +92,8 @@ class SceneManager:
             cast (Cast): an instance of Cast 
             script (Script): an instance of Script
         """
-        self._add_players(cast, self.network_status)
-        self._add_board(cast, self.network_status)
+        self._add_players(cast)
+        self._add_board(cast)
         self._add_dialog(cast, ENTER_TO_START)
 
         self._add_initialize_script(script)
@@ -118,7 +120,7 @@ class SceneManager:
     # ----------------------------------------------------------------------------------------------
     # casting methods
     # ----------------------------------------------------------------------------------------------
-    def _add_players(self, cast: Cast, network_status):
+    def _add_players(self, cast: Cast):
         """Adds players to the game
 
         Args:
@@ -135,7 +137,7 @@ class SceneManager:
         cast.add_actor(CURRENT_PLAYER_GROUP,cast.get_first_actor(PLAYERS_GROUP))
 
         #set the network up in the player if it is a network game.
-        if network_status == NETWORK_SERVER:
+        if self.network_status == NETWORK_SERVER:
             #set server player 
             player: Player = cast.get_first_actor(CURRENT_PLAYER_GROUP)
             player.set_network(NETWORK_SERVER)
@@ -148,7 +150,7 @@ class SceneManager:
             player.current_turn = False
 
 
-        if network_status == NETWORK_CLIENT:
+        if self.network_status == NETWORK_CLIENT:
 
             #set client player
             player: Player = cast.get_next_player()
@@ -162,7 +164,7 @@ class SceneManager:
             player.client_server = NETWORK_SERVER
             player.me = False
 
-        if network_status == NETWORK_NONE:
+        if self.network_status == NETWORK_NONE:
             player: Player = cast.get_first_actor(CURRENT_PLAYER_GROUP)
             player.current_turn = True
             player.client_server = NETWORK_NONE
@@ -181,7 +183,7 @@ class SceneManager:
         label = Label(text, position)
         cast.add_actor(DIALOG_GROUP, label)
 
-    def _add_board(self, cast: Cast, network_status):
+    def _add_board(self, cast: Cast):
         """Adds the board
 
         Args:
@@ -194,13 +196,16 @@ class SceneManager:
                     hole = Actor(position=Point(i,j))
                     cast.add_actor(HOLES_GROUP, hole)
 
+        
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
         #set up which player you are for network game
-        if network_status == NETWORK_SERVER:
-                text ="You are playing the Red pieces."
+        if self.network_status == NETWORK_SERVER:
+                text =f"RED: {hostname}, {ip_address}"
                 cast.add_actor(PLAYER_COLOR_STATUS_GROUP, Actor(text=text,position=Point(19,26),color=RED))        
                 
-        if network_status == NETWORK_CLIENT:
-                text ="You are playing the Black pieces."
+        if self.network_status == NETWORK_CLIENT:
+                text =f"BLACK: {hostname}, {ip_address}"
                 cast.add_actor(PLAYER_COLOR_STATUS_GROUP, Actor(text=text,position=Point(19,26),color=BLACK))   
         
 

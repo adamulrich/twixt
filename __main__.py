@@ -7,6 +7,7 @@ import sys
 def main():
 
     network_status = NETWORK_NONE
+    connect_to_ip_address = "localhost"
 
     if len(sys.argv) > 1:
         arg = sys.argv[1].lower()
@@ -17,8 +18,16 @@ def main():
         elif arg == "--client":
             network_status = NETWORK_CLIENT
 
+            try: 
+                connect_to_ip_address = sys.argv[2].lower()
 
-    director = Director(SceneManager.VIDEO_SERVICE, network_status)
+            except:
+                connect_to_ip_address = "localhost"
+
+            
+
+
+    director = Director(SceneManager.VIDEO_SERVICE, network_status, connect_to_ip_address)
 
 
     director.start_game()

@@ -16,14 +16,14 @@ class Director(ActionCallback):
         _script: an instance of Script
         _scene_manager: an instance of SceneManager """
 
-    def __init__(self, video_service, network_status):
+    def __init__(self, video_service, network_status, ip_address):
         """Constructs a new Director using the specified video service.
         """
 
         self._video_service = video_service
         self._cast = Cast()
         self._script = Script()
-        self._scene_manager = SceneManager(network_status)
+        self._scene_manager = SceneManager(network_status, ip_address)
 
         
     def on_next(self, scene):
@@ -59,4 +59,3 @@ class Director(ActionCallback):
         for action in actions:
             action.execute(self._cast, self._script, self)          
     
-

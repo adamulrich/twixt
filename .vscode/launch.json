@@ -5,14 +5,14 @@
     "version": "0.2.0",
     "configurations": [
 
-        // {
-        //     "name": "Python: default",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "__main__.py",
-        //     "console": "integratedTerminal",
-        //     "justMyCode": true,
-        // },
+        {
+            "name": "Python: default",
+            "type": "python",
+            "request": "launch",
+            "program": "__main__.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+        },
         {
             "name": "Python: --server",
             "type": "python",
@@ -24,17 +24,17 @@
                 "--server"
             ]
         },
-        // {
-        //     "name": "Python: --client",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "__main__.py",
-        //     "console": "integratedTerminal",
-        //     "justMyCode": true,
-        //     "args": [
-        //         "--client"
-        //     ]
-        // }
+        {
+            "name": "Python: --client",
+            "type": "python",
+            "request": "launch",
+            "program": "__main__.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--client"
+            ]
+        }
     
     ]
 }

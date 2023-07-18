@@ -56,8 +56,9 @@ class DrawBoardAction(Action):
 
         #draw message
         status: Actor = cast.get_first_actor(constants.PLAYER_COLOR_STATUS_GROUP)
-        text = Text(status.get_text(),constants.FONT_FILE,alignment=constants.ALIGN_CENTER, color=status.get_color())
-        self._video_service.draw_text(text, status.get_screen_position(), status.get_color())
+        if status is not None:
+            text = Text(status.get_text(),constants.FONT_FILE,alignment=constants.ALIGN_CENTER, color=status.get_color())
+            self._video_service.draw_text(text, status.get_screen_position(), status.get_color())
 
 
    

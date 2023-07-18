@@ -157,37 +157,10 @@ class Player(Actor):
     def get_direction(self):
         return self._direction
 
-
-    # def create_server(self):
-    #     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #     server.bind((self.SERVER, self.PORT))
-    #     server.listen(1)
-
-    #     self.client, addr = server.accept()
-
-    #     threading.Thread(target=self.handle_connection, args=(self.client,)).start()
-    #     server.close()
-
-    #     self.client_server = NETWORK_SERVER
-
-    # def create_client(self):
-    #     self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #     self.client.connect((self.IPADDRESS, self.PORT))
-
-    #     threading.Thread(target=self.handle_connection, args=(client,)).start()
-
-    #     self.client_server = NETWORK_CLIENT
-
     def set_network(self, network_status):
         self.network_service = NetworkService(self.IPADDRESS,self.PORT, network_status)
         self.client_server = network_status
 
-    def get_client_data(self, client):
-        data = client.recv(1024)
-        if not data:
-            client.close()
-        else:
-            #make move
-            return data.decode('utf-8')
+
 
 

@@ -24,7 +24,7 @@ from game.scripting.release_devices_action import ReleaseDevicesAction
 from game.scripting.change_player_action import ChangePlayerAction
 from game.services.network_service import NetworkService
 from game.scripting.handle_network_mouse_click_action import HandleNetworkMouseClickAction
-from game.scripting.draw_network_waiting_action import DrawNetworkWaitingAction
+
 class SceneManager:
     """The person in charge of setting up the cast and script for each scene."""
 
@@ -44,7 +44,7 @@ class SceneManager:
 
 
     START_DRAWING_ACTION = StartDrawingAction(VIDEO_SERVICE)
-    DRAW_NETWORK_WAITING_ACTION = DrawNetworkWaitingAction()
+    
 
     DRAW_BOARD_ACTION = DrawBoardAction(VIDEO_SERVICE)
     DRAW_BRIDGES_ACTION = DrawBridgesAction(VIDEO_SERVICE)
@@ -90,9 +90,9 @@ class SceneManager:
             cast (Cast): an instance of Cast 
             script (Script): an instance of Script
         """
-        self._add_board(cast)
-        self._add_dialog(cast, ENTER_TO_START)
         self._add_players(cast, self.network_status)
+        self._add_board(cast, self.network_status)
+        self._add_dialog(cast, ENTER_TO_START)
 
         self._add_initialize_script(script)
 
@@ -136,17 +136,37 @@ class SceneManager:
 
         #set the network up in the player if it is a network game.
         if network_status == NETWORK_SERVER:
-            player: Player = cast._current_player
-            player.set_network(network_status)
-            player.current_tu5rn = True
+            #set server player 
+            player: Player = cast.get_first_actor(CURRENT_PLAYER_GROUP)
+            player.set_network(NETWORK_SERVER)
+            player.current_turn = True
             player.me = True
 
-        if network_status == NETWORK_CLIENT:
+            #set client player
             player: Player = cast.get_next_player()
-            player.set_network(network_status)
+            player.client_server = NETWORK_CLIENT
+            player.current_turn = False
+
+
+        if network_status == NETWORK_CLIENT:
+
+            #set client player
+            player: Player = cast.get_next_player()
+            player.set_network(NETWORK_CLIENT)
             player.current_turn = False
             player.me = True
-            
+
+            #set server player
+            player: Player = cast.get_first_actor(CURRENT_PLAYER_GROUP)
+            player.current_turn = True
+            player.client_server = NETWORK_SERVER
+            player.me = False
+
+        if network_status == NETWORK_NONE:
+            player: Player = cast.get_first_actor(CURRENT_PLAYER_GROUP)
+            player.current_turn = True
+            player.client_server = NETWORK_NONE
+
 
     def _add_dialog(self, cast: Cast, message):
         """Adds dialog to the game
@@ -161,7 +181,7 @@ class SceneManager:
         label = Label(text, position)
         cast.add_actor(DIALOG_GROUP, label)
 
-    def _add_board(self, cast: Cast):
+    def _add_board(self, cast: Cast, network_status):
         """Adds the board
 
         Args:
@@ -173,6 +193,16 @@ class SceneManager:
                 if (i, j) not in except_list:
                     hole = Actor(position=Point(i,j))
                     cast.add_actor(HOLES_GROUP, hole)
+
+        #set up which player you are for network game
+        if network_status == NETWORK_SERVER:
+                text ="You are playing the Red pieces."
+                cast.add_actor(PLAYER_COLOR_STATUS_GROUP, Actor(text=text,position=Point(19,26),color=RED))        
+                
+        if network_status == NETWORK_CLIENT:
+                text ="You are playing the Black pieces."
+                cast.add_actor(PLAYER_COLOR_STATUS_GROUP, Actor(text=text,position=Point(19,26),color=BLACK))   
+        
 
         cast.add_actor(STATUS_GROUP, Actor(text=RED_PLAYERS_TURN,position= Point(15,24),color=RED) )
 
@@ -199,9 +229,6 @@ class SceneManager:
         script.add_action(INPUT, self.HANDLE_MOUSE_CLICK_ACTION)
         script.add_action(INPUT, self.HANDLE_NETWORK_MOUSE_CLICK_ACTION)
 
-        # else: 
-        # script.add_action(INPUT, self.HANDLE_MOVE_PREVIEW_ACTION_NETWORK)
-        # script.add_action(INPUT, self.HANDLE_MOUSE_CLICK_ACTION_NETWORK)
 
     def _add_update_script(self, script: Script):
         """Adds the script to update the game
@@ -210,7 +237,6 @@ class SceneManager:
             script (Script): an instance of Script
         """
         script.clear_actions(UPDATE)
-        script.add_action(UPDATE, self.DRAW_NETWORK_WAITING_ACTION)
         script.add_action(UPDATE, self.ADD_PEG_ACTION)
         script.add_action(UPDATE, self.ADD_ALL_POSSIBLE_BRIDGES_ACTION)
         script.add_action(UPDATE, self.CHANGE_PLAYER_ACTION)

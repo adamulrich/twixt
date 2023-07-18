@@ -62,8 +62,6 @@ class HandleMouseClickAction(Action):
 
                             #if we are the client, we need to send data to the server
                             
-                    
-
                             break
 
     def _is_mouse_over(self, hole: Actor, position: Point):

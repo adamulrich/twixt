@@ -40,7 +40,7 @@ class Director(ActionCallback):
         self.on_next(NEW_GAME)
         self._execute_actions(INITIALIZE)
         self._execute_actions(LOAD)
-        while self._video_service.is_window_open():
+        while self._video_service.is_window_open(): 
             self._execute_actions(INPUT)
             self._execute_actions(UPDATE)
             self._execute_actions(OUTPUT)

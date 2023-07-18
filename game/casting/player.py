@@ -32,6 +32,11 @@ class Player(Actor):
         self.network_service = None
         self.current_turn = None
 
+        if color==RED:
+            self.color_name = "RED"
+        else:
+            self.color_name = "BLACK"
+
 
     def get_pegs(self):
         """returns the list of this players pegs from the pieces object
@@ -175,6 +180,7 @@ class Player(Actor):
 
     def set_network(self, network_status):
         self.network_service = NetworkService(self.IPADDRESS,self.PORT, network_status)
+        self.client_server = network_status
 
     def get_client_data(self, client):
         data = client.recv(1024)

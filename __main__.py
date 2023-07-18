@@ -12,10 +12,10 @@ def main():
         arg = sys.argv[1].lower()
     
         if arg == "--server":
-            network_status == NETWORK_SERVER
+            network_status = NETWORK_SERVER
 
         elif arg == "--client":
-            network_status == NETWORK_CLIENT
+            network_status = NETWORK_CLIENT
 
 
     director = Director(SceneManager.VIDEO_SERVICE, network_status)

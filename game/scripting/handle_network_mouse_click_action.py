@@ -65,32 +65,34 @@ class HandleNetworkMouseClickAction(Action):
                                 cast.add_actor(NEW_PEG_GROUP,peg)
 
                                 # send data to other player
-                                player._network_service.send_data(po)
+                                player.network_service.send_data(position)
 
                                 break
             else:
-                position = player.network_service.get_data()
+                next_player: Player = cast.get_next_player()
+                position = next_player.network_service.get_data()
+                if position:
 
-                # get the empty holes
-                holes: list[Actor] = cast.get_actors(HOLES_GROUP)
+                    # get the empty holes
+                    holes: list[Actor] = cast.get_actors(HOLES_GROUP)
 
-                #translate this to a location for a hole
-                for hole in holes:
-                    if self._is_mouse_over(hole.get_screen_position(), position):
+                    #translate this to a location for a hole
+                    for hole in holes:
+                        if self._is_mouse_over(hole.get_screen_position(), position):
 
-                        #check for valid location for this player
-                        direction = player.get_direction()
-                        if  MIN_X[direction] <= hole.get_position().get_x() <= MAX_X[direction] \
-                            and MIN_Y[direction] <= hole.get_position().get_y() <= MAX_Y[direction]:
+                            #check for valid location for this player
+                            direction = player.get_direction()
+                            if  MIN_X[direction] <= hole.get_position().get_x() <= MAX_X[direction] \
+                                and MIN_Y[direction] <= hole.get_position().get_y() <= MAX_Y[direction]:
 
-                            #remove hole from hole list
-                            cast.remove_actor(HOLES_GROUP,hole)
+                                #remove hole from hole list
+                                cast.remove_actor(HOLES_GROUP,hole)
 
-                            #create a new peg, add it to the new hole group
-                            peg = Peg(player.get_color(), player.get_direction(), hole.get_position())
-                            cast.add_actor(NEW_PEG_GROUP,peg)
+                                #create a new peg, add it to the new hole group
+                                peg = Peg(player.get_color(), player.get_direction(), hole.get_position())
+                                cast.add_actor(NEW_PEG_GROUP,peg)
 
-                            break
+                                break
 
 
 

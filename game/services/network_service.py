@@ -32,8 +32,6 @@ class NetworkService:
         self.client.connect((host, port))
         self.client.setblocking(0)
 
-        #threading.Thread(target=self.handle_connection, args=(client,)).start()
-
     def get_data(self): 
         try:
             data = self.client.recv(2048)
@@ -44,31 +42,9 @@ class NetworkService:
         except:
             return None
 
-            
-            
-
-
     def send_data(self, position: Point):
          x = position.get_x()
          y = position.get_y()
          self.client.sendall(str.encode("\n".join([str(x), str(y)])))
 
 
-    # def handle_connection(self, client):
-    #     while not self.game_over:
-    #         if self.turn == self.you:
-    #             # get mouse input
-    #             pass
-
-    #         else:
-    #             data = client.recv(2048)
-    #             if not data:
-    #                 client.close()
-    #                 break
-    #             else:
-    #                 #make move
-
-
-
-
-    

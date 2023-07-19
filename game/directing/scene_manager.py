@@ -148,6 +148,7 @@ class SceneManager:
             player: Player = cast.get_next_player()
             player.client_server = NETWORK_CLIENT
             player.current_turn = False
+            player.IPADDRESS = self.ip_address
 
 
         if self.network_status == NETWORK_CLIENT:

@@ -20,7 +20,7 @@ class Player(Actor):
     """
 
     PORT = 9999
-    IPADDRESS = "localhost"
+    IPADDRESS = "0.0.0.0"
 
 
     def __init__(self, color, direction):
@@ -160,7 +160,3 @@ class Player(Actor):
     def set_network(self, network_status):
         self.network_service = NetworkService(self.IPADDRESS,self.PORT, network_status)
         self.client_server = network_status
-
-
-
-

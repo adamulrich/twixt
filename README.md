@@ -2,7 +2,7 @@
 
 This project extends a python game (Twixt) I wrote previously by adding network play to it. I implmented this to learn how simple networking works with python
 
-[Software Demo Video](http://youtube.link.goes.here)
+[Software Demo Video](https://youtu.be/pAGcm8ByzSs)
 
 ## game definition
 
@@ -28,15 +28,14 @@ This network implementation uses client/server, over TCP port 9999. The format o
 
 ## Useful Websites
 
-- [Python Network Game Tutorial] (https://www.youtube.com/watch?v=s6HOPw_5XuY)
-- [Raylib] (https://www.raylib.com/)
+- [Python Network Game Tutorial](https://www.youtube.com/watch?v=s6HOPw_5XuY)
+- [Raylib](https://www.raylib.com/)
 - [Twixt in JavaScript](https://twixtlive.com/)
-- [Twixt Game Play](https://boardgamegeek.com/boardgame/949/twixt)
+- [Twixt Game Play and Rules](https://boardgamegeek.com/boardgame/949/twixt)
 
 ## Future Work
 
 {Make a list of things that you need to fix, improve, and add in the future.}
 
-- Item 1
-- Item 2
-- Item 3
+- Refactor handle network mouse action. It doesn't need to be a separate action, and has redundant code with the regular action.
+- The networking is brittle, and would hang if no response happens.

@@ -32,7 +32,8 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "--client"
+                "--client", 
+                "localhost"
             ]
         }
     

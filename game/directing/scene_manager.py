@@ -1,4 +1,5 @@
 import csv
+import socket
 from constants import *
 from game.casting.label import Label
 from game.casting.point import Point
@@ -22,13 +23,15 @@ from game.scripting.handle_move_preview_action import HandleMovePreviewAction
 from game.scripting.handle_win_action import HandleWinAction
 from game.scripting.release_devices_action import ReleaseDevicesAction
 from game.scripting.change_player_action import ChangePlayerAction
-
+from game.services.network_service import NetworkService
+from game.scripting.handle_network_mouse_click_action import HandleNetworkMouseClickAction
 
 class SceneManager:
     """The person in charge of setting up the cast and script for each scene."""
 
     MOUSE_SERVICE = RaylibMouseService()
     VIDEO_SERVICE = RaylibVideoService(GAME_NAME, SCREEN_WIDTH, 1000)
+
 
     INITIALIZE_DEVICES_ACTION = InitializeDevicesAction(VIDEO_SERVICE)
 
@@ -38,8 +41,12 @@ class SceneManager:
     CHANGE_PLAYER_ACTION = ChangePlayerAction()
     HANDLE_WIN_ACTION = HandleWinAction()
     HANDLE_MOVE_PREVIEW_ACTION = HandleMovePreviewAction(VIDEO_SERVICE, MOUSE_SERVICE)
+    HANDLE_NETWORK_MOUSE_CLICK_ACTION = HandleNetworkMouseClickAction(MOUSE_SERVICE)
+
 
     START_DRAWING_ACTION = StartDrawingAction(VIDEO_SERVICE)
+    
+
     DRAW_BOARD_ACTION = DrawBoardAction(VIDEO_SERVICE)
     DRAW_BRIDGES_ACTION = DrawBridgesAction(VIDEO_SERVICE)
     DRAW_PEGS_ACTION = DrawPegsAction(VIDEO_SERVICE)
@@ -48,13 +55,15 @@ class SceneManager:
     RELEASE_DEVICES_ACTION = ReleaseDevicesAction( VIDEO_SERVICE)
     
 
-    def __init__(self):
+    def __init__(self, network_status, ip_address):
         """ Initialization for a SceneManager"""
-        pass
+        self.network_status = network_status
+        self.ip_address = ip_address
 
     def prepare_scene(self, scene, cast: Cast, script: Script):
         """Prepares the scene that corresponds to a number
 
+    
         Args:
             scene: A number that is saved to a scene of the game
             cast (Cast): an instance of Cast 
@@ -69,6 +78,9 @@ class SceneManager:
         elif scene == GAME_OVER:
             self._prepare_game_over(cast, script)
 
+
+
+
     # ----------------------------------------------------------------------------------------------
     # scene methods
     # ----------------------------------------------------------------------------------------------
@@ -80,9 +92,9 @@ class SceneManager:
             cast (Cast): an instance of Cast 
             script (Script): an instance of Script
         """
+        self._add_players(cast)
         self._add_board(cast)
         self._add_dialog(cast, ENTER_TO_START)
-        self._add_players(cast)
 
         self._add_initialize_script(script)
 
@@ -124,6 +136,42 @@ class SceneManager:
         #set the current actor
         cast.add_actor(CURRENT_PLAYER_GROUP,cast.get_first_actor(PLAYERS_GROUP))
 
+        #set the network up in the player if it is a network game.
+        if self.network_status == NETWORK_SERVER:
+            #set server player 
+            player: Player = cast.get_first_actor(CURRENT_PLAYER_GROUP)
+            player.set_network(NETWORK_SERVER)
+            player.current_turn = True
+            player.me = True
+
+            #set client player
+            player: Player = cast.get_next_player()
+            player.client_server = NETWORK_CLIENT
+            player.current_turn = False
+            
+
+        if self.network_status == NETWORK_CLIENT:
+
+            #set client player
+            player: Player = cast.get_next_player()
+            player.set_network(NETWORK_CLIENT)
+            player.current_turn = False
+            player.me = True
+
+            #set server player
+            player: Player = cast.get_first_actor(CURRENT_PLAYER_GROUP)
+            player.current_turn = True
+            player.client_server = NETWORK_SERVER
+            player.me = False
+            player.IPADDRESS = self.ip_address
+
+
+        if self.network_status == NETWORK_NONE:
+            player: Player = cast.get_first_actor(CURRENT_PLAYER_GROUP)
+            player.current_turn = True
+            player.client_server = NETWORK_NONE
+
+
     def _add_dialog(self, cast: Cast, message):
         """Adds dialog to the game
 
@@ -150,6 +198,19 @@ class SceneManager:
                     hole = Actor(position=Point(i,j))
                     cast.add_actor(HOLES_GROUP, hole)
 
+        
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
+        #set up which player you are for network game
+        if self.network_status == NETWORK_SERVER:
+                text =f"RED: {hostname}, {ip_address}"
+                cast.add_actor(PLAYER_COLOR_STATUS_GROUP, Actor(text=text,position=Point(19,26),color=RED))        
+                
+        if self.network_status == NETWORK_CLIENT:
+                text =f"BLACK: {hostname}, {ip_address}"
+                cast.add_actor(PLAYER_COLOR_STATUS_GROUP, Actor(text=text,position=Point(19,26),color=BLACK))   
+        
+
         cast.add_actor(STATUS_GROUP, Actor(text=RED_PLAYERS_TURN,position= Point(15,24),color=RED) )
 
     # ----------------------------------------------------------------------------------------------
@@ -170,8 +231,11 @@ class SceneManager:
         Args:
             script (Script): an instance of Script
         """
+
         script.add_action(INPUT, self.HANDLE_MOVE_PREVIEW_ACTION)
         script.add_action(INPUT, self.HANDLE_MOUSE_CLICK_ACTION)
+        script.add_action(INPUT, self.HANDLE_NETWORK_MOUSE_CLICK_ACTION)
+
 
     def _add_update_script(self, script: Script):
         """Adds the script to update the game

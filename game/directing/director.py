@@ -16,14 +16,15 @@ class Director(ActionCallback):
         _script: an instance of Script
         _scene_manager: an instance of SceneManager """
 
-    def __init__(self, video_service):
+    def __init__(self, video_service, network_status, ip_address):
         """Constructs a new Director using the specified video service.
-        
         """
+
         self._video_service = video_service
         self._cast = Cast()
         self._script = Script()
-        self._scene_manager = SceneManager()
+        self._scene_manager = SceneManager(network_status, ip_address)
+
         
     def on_next(self, scene):
         """Overriden ActionCallback method transitions to next scene.
@@ -35,10 +36,11 @@ class Director(ActionCallback):
         
     def start_game(self):
         """Starts the game. Runs the main game loop."""
+
         self.on_next(NEW_GAME)
         self._execute_actions(INITIALIZE)
         self._execute_actions(LOAD)
-        while self._video_service.is_window_open():
+        while self._video_service.is_window_open(): 
             self._execute_actions(INPUT)
             self._execute_actions(UPDATE)
             self._execute_actions(OUTPUT)
@@ -56,3 +58,4 @@ class Director(ActionCallback):
         actions = self._script.get_actions(group)    
         for action in actions:
             action.execute(self._cast, self._script, self)          
+    

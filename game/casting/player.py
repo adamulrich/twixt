@@ -3,8 +3,11 @@ from game.casting.actor import Actor
 from game.casting.pieces import Pieces
 from game.casting.peg import Peg
 from game.casting.point import Point
+from game.services.network_service import NetworkService
 from typing import List
-
+import socket
+import threading
+from constants import *
 
 class Player(Actor):
     """The responsibility of Player is to keep track of all the pegs and bridges that the player has and to determine 
@@ -16,10 +19,23 @@ class Player(Actor):
         _direction: the player 1 or 2
     """
 
+    PORT = 9999
+    IPADDRESS = "0.0.0.0"
+
+
     def __init__(self, color, direction):
         super().__init__(color=color, position=Point(0,0),text="")
+        self.me = False
         self._pieces = Pieces()
         self._direction = direction
+        self.client_server = NETWORK_NONE
+        self.network_service = None
+        self.current_turn = None
+
+        if color==RED:
+            self.color_name = "RED"
+        else:
+            self.color_name = "BLACK"
 
 
     def get_pegs(self):
@@ -140,3 +156,7 @@ class Player(Actor):
 
     def get_direction(self):
         return self._direction
+
+    def set_network(self, network_status):
+        self.network_service = NetworkService(self.IPADDRESS,self.PORT, network_status)
+        self.client_server = network_status

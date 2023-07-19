@@ -4,13 +4,38 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
-            "name": "Python: Current File",
+            "name": "Python: default",
             "type": "python",
             "request": "launch",
             "program": "__main__.py",
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": true,
+        },
+        {
+            "name": "Python: --server",
+            "type": "python",
+            "request": "launch",
+            "program": "__main__.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--server"
+            ]
+        },
+        {
+            "name": "Python: --client",
+            "type": "python",
+            "request": "launch",
+            "program": "__main__.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--client", 
+                "localhost"
+            ]
         }
+    
     ]
 }

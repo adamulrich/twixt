@@ -1,3 +1,4 @@
+import socket
 from constants import *
 from game.directing.director import Director
 from game.directing.scene_manager import SceneManager
@@ -8,12 +9,16 @@ def main():
 
     network_status = NETWORK_NONE
     connect_to_ip_address = "localhost"
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
+
 
     if len(sys.argv) > 1:
         arg = sys.argv[1].lower()
     
         if arg == "--server":
             network_status = NETWORK_SERVER
+            print(ip_address)
 
         elif arg == "--client":
             network_status = NETWORK_CLIENT
